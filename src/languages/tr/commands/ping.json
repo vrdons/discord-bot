@@ -1,0 +1,11 @@
+{
+  "Name": "gecikme",
+  "Description": "Botun gecikmesini gösterir",
+  "title": "Gecikme bilgileri",
+  "wait": "Hesaplanıyor, lütfen bekleyin...",
+  "result": [
+    "[[ping.bot]] **Bot Gecikmesi**: {{bot_ping, duration}}",
+    "[[ping.message]] **Mesaj gecikmesi**: {{message_ping, duration}}",
+    "[[ping.database]] **Veritabanı gecikmesi**: {{db_ping, duration}}"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "extends": "@sapphire/ts-config",
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "es2022",
+    "moduleResolution": "bundler",
+    "baseUrl": "./src",
+    "paths": {
+      "@src/*": ["src/*"]
+    },
+    "types": [
+      "@sapphire/plugin-i18next",
+      "@sapphire/plugin-hmr/register",
+      "@sapphire/plugin-logger",
+      "@sapphire/plugin-subcommands"
+    ],
+    "outDir": "./out",
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "out"]
+}
