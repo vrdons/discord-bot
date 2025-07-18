@@ -2,13 +2,14 @@
 
 [?] Good template, handler
 
-- [+] rules
 - [+] guild prefix
 - [+] guild locale
 - [+] user locale
 - [+] locale alias (automate)
 - [+] custom randomizer
 - [+] custom i18n (emojis, formatter etc.)
+- [+] rules
+- [-] Admin only command
 - [?] custom error message (cooldown etc.)
 
 [?] Basic commands
@@ -39,17 +40,30 @@
 - [-] blackjack
 - [-] xox
 - [-] minesweepers
+- [-] roulette
+- [-] guessnumber
+- [-] slots
+- [-] case opening (why not?)
 
 [-] User friendly commands
 
 - [-] birthday
 - [-] reminder
+- [-] pay (give)
 
 [-] Jobs
 
 - [-] myjob
 - [-] Work
 - [-] Beg
+- [-] Work level (status)
+
+[-] Market system
+
+- [-] Current Stock system
+- [-] Sell system
+- [-] Auction system
+- [-] Use Item
 
 [-] Quest system
 
@@ -67,6 +81,8 @@
 
 [-] Promo code system
 
+- [-] Ticket system
+
 [?] Voting system
 
 - [?] TOP.GG
@@ -76,6 +92,15 @@
 [-] Black market
 
 [-] Allow disabling commands in channel
+
+[-] Extra
+
+- [-] Ban User
+
+[-] Adversiment system
+
+- [-] User adversiment
+- [-] Surveys (for spesific users)
 
 [-] More language
 
