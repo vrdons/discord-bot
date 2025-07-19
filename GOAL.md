@@ -1,6 +1,6 @@
 # Goals for this project
 
-[?] Good template, handler
+[+] Good template, handler
 
 - [+] guild prefix
 - [+] guild locale
@@ -9,8 +9,8 @@
 - [+] custom randomizer
 - [+] custom i18n (emojis, formatter etc.)
 - [+] rules
-- [-] Admin only command
-- [?] custom error message (cooldown etc.)
+- [+] Admin only command
+- [+] custom error message (cooldown etc.)
 
 [?] Basic commands
 
@@ -95,7 +95,7 @@
 
 [-] Extra
 
-- [-] Ban User
+- [-] [ADMIN] Ban User
 
 [-] Adversiment system
 

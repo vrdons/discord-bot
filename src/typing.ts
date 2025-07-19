@@ -31,6 +31,3 @@ declare module "@sapphire/pieces" {
     };
   }
 }
-export type CooldownContext = {
-  remaining: number;
-};

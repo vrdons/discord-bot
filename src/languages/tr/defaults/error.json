@@ -1,4 +1,6 @@
 {
   "onCooldown_time": "[[cooldown]] Lütfen {{time, timestamp:R}} tekrar bekleyin.",
-  "onCooldown": "[[cooldown]] Lütfen daha sonra tekrar bekleyin."
+  "onCooldown": "[[cooldown]] Lütfen daha sonra tekrar bekleyin.",
+  "argsMissing": "Daha fazla argüman yok.",
+  "argsUnavailable": "{{name}} argümanı bulunamadı."
 }
