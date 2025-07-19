@@ -29,9 +29,10 @@ const client = new SapphireClient({
 
   i18n: LanguageConfig,
 });
-ApplicationCommandRegistries.setDefaultBehaviorWhenNotIdentical(
+/* ApplicationCommandRegistries.setDefaultBehaviorWhenNotIdentical(
   RegisterBehavior.BulkOverwrite,
 );
+*/
 async function main() {
   const obj = {
     ...Links,

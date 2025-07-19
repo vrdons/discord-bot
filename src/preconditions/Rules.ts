@@ -1,10 +1,9 @@
 import { AllFlowsPrecondition, Result, UserError } from "@sapphire/framework";
-import { sleep, sleepSync } from "@sapphire/utilities";
+import { sleep } from "@sapphire/utilities";
 import {
   CommandInteraction,
   ContextMenuCommandInteraction,
   Message,
-  ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
   ComponentType,
@@ -21,7 +20,7 @@ export class RulesPrecontidion extends AllFlowsPrecondition {
   public constructor(context: AllFlowsPrecondition.LoaderContext) {
     super(context, {
       name: "RulesOnly",
-      position: 15,
+      position: 15, //before cooldown
     });
   }
 
@@ -51,7 +50,11 @@ export class RulesPrecontidion extends AllFlowsPrecondition {
     const locale = await fetchLocale(source as Interaction);
 
     const t = this.container.i18n.getT(locale);
-    const r = this.generateRules(locale, t, await User.totalAccepted);
+    const r = RulesPrecontidion.generateRules(
+      locale,
+      t,
+      await User.totalAccepted,
+    );
 
     const response =
       source instanceof Message ? await source.reply(r) : await source.reply(r);
@@ -59,7 +62,7 @@ export class RulesPrecontidion extends AllFlowsPrecondition {
     try {
       const confirmation = await response.awaitMessageComponent({
         componentType: ComponentType.Button,
-        time: 60_000,
+        time: 120_000,
         filter: (i) => i.user.id === userId,
       });
 
@@ -93,26 +96,32 @@ export class RulesPrecontidion extends AllFlowsPrecondition {
       return this.error();
     }
   }
-  generateRules(lang: string, t: TFunction, totalAccept: any) {
+  static generateRules(
+    lang: string,
+    t: TFunction,
+    totalAccept: any,
+    generateActionRow: boolean = true,
+  ) {
     const comp = new CustomContainer(lang);
-    comp.addTitle(undefined, true, "defaults/container:rules.title");
+    comp.addTitle(undefined, true, "commands/rules:title");
     comp.addSeperator();
-    comp.addTexts(true, "defaults/container:rules.description");
+    comp.addTexts(true, "commands/rules:botDescription");
     comp.addSeperator();
-    comp.addTexts(false, "defaults/container:rules.extraInformation");
-    comp.addActionRowComponents((act) =>
-      act.addComponents(
-        new ButtonBuilder()
-          .setCustomId("accept_rules")
-          .setLabel(t("defaults/container:rules.buttons.accept"))
-          .setStyle(ButtonStyle.Primary),
-        new ButtonBuilder()
-          .setCustomId("decline_rules")
-          .setLabel(t("defaults/container:rules.buttons.decline"))
-          .setStyle(ButtonStyle.Danger),
-      ),
-    );
-    comp.addFooter(undefined, "defaults/container:rules.footer", {
+    comp.addTexts(false, "commands/rules:extraInformation");
+    if (generateActionRow)
+      comp.addActionRowComponents((act) =>
+        act.addComponents(
+          new ButtonBuilder()
+            .setCustomId("accept_rules")
+            .setLabel(t("commands/rules:buttons.accept"))
+            .setStyle(ButtonStyle.Primary),
+          new ButtonBuilder()
+            .setCustomId("decline_rules")
+            .setLabel(t("commands/rules:buttons.decline"))
+            .setStyle(ButtonStyle.Danger),
+        ),
+      );
+    comp.addFooter(undefined, "commands/rules:footer", {
       totalAccept,
     });
     return { flags: MessageFlags.IsComponentsV2 as const, components: [comp] };

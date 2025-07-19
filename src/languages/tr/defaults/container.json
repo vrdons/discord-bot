@@ -8,26 +8,5 @@
       "vote": "Oy",
       "invite": "Davet"
     }
-  },
-  "rules": {
-    "title": "Kurallar",
-    "accepted": "Kuralları kabul ettiğiniz için teşekkürler, komutu tekrar kullanarak işlemine devam edebilirsin",
-    "accepted_message": "Kuralları kabul ettiğiniz için teşekkürler, işleminiz devam ediliyor...",
-    "declined": "Kurallar reddedildi...",
-    "footer": "**{{totalAccept}}** kullanıcı kuralları kabul etti.",
-    "description": [
-      "Botta bulunan herhangi bir ürünün ticaretini yapmak yasaktır.",
-      "Botta bulunan hataları geliştiricilere bildirmeyip, kendi yararınıza kullanmanız yasaktır.",
-      "Otomatik olarak botta gelişmenizi sağlayacak yazılım dosyaları kullanmanız yasaktır.",
-      "Botta elde ettiğiniz verilerin, geleceğe dair hiçbir garantisi bulunmamaktadır. Botun amacı ve işleyiş şekli herhangi bir zamanda değiştirilebilir."
-    ],
-    "extraInformation": [
-      "[[warning]] *Burada yazılı olan kuralların ihlal edilmesi sonucunda sınırsız karaliste veya gerekli cezalandırmalar ile karşılaşabilirsiniz*\\*!",
-      "- Herhangi bir sorununuz var ise [destek sunucumuza]({{supportLink}}) katılabilirsiniz!"
-    ],
-    "buttons": {
-      "accept": "Kabul ediyorum",
-      "decline": "Reddediyorum"
-    }
   }
 }

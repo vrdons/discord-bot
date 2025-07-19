@@ -1,36 +1,31 @@
 import type { Message } from "discord.js";
-import { Command, Events, Listener } from "@sapphire/framework";
+import {
+  Command,
+  Events,
+  Listener,
+  UnknownMessageCommandPayload,
+} from "@sapphire/framework";
 import { defaultLng } from "config/LanguageConfig";
 import { ensureArray } from "libs/utils";
 
 type MessageCommand = Command & Required<Pick<Command, "messageRun">>;
 
-export class CoreListener extends Listener<typeof Events.PrefixedMessage> {
-  private readonly commandCache = new Map<string, Set<string>>();
-  private lastCacheUpdate = 0;
-  private readonly CACHE_TTL = 60000;
-
+export class CoreListener extends Listener<
+  typeof Events.UnknownMessageCommand
+> {
   public constructor(context: Listener.LoaderContext) {
-    super(context, { event: Events.PrefixedMessage });
+    super(context, { event: Events.UnknownMessageCommand });
   }
 
-  public async run(message: Message, prefix: string | RegExp) {
+  public async run(payload: UnknownMessageCommandPayload) {
+    const prefix = payload.prefix;
+    const commandPrefix = payload.commandPrefix;
+    const message = payload.message;
     const { client } = this.container;
-    const commandPrefix =
-      typeof prefix === "string" ? prefix : prefix.exec(message.content)![0];
     const prefixLess = message.content.slice(commandPrefix.length).trim();
     const spaceIndex = prefixLess.indexOf(" ");
     const commandName =
       spaceIndex === -1 ? prefixLess : prefixLess.slice(0, spaceIndex);
-
-    if (!commandName) {
-      client.emit(Events.UnknownMessageCommandName, {
-        message,
-        prefix,
-        commandPrefix,
-      });
-      return;
-    }
 
     const lng = await this.resolveLanguage(message);
     const command = await this.findCommand(commandName.toLowerCase(), lng);
@@ -54,7 +49,7 @@ export class CoreListener extends Listener<typeof Events.PrefixedMessage> {
       message,
       command: command as MessageCommand,
       parameters,
-      context: { commandName, commandPrefix, prefix },
+      context: { commandName, commandPrefix, prefix, note: "fromAlias" },
     });
   }
 
@@ -71,18 +66,6 @@ export class CoreListener extends Listener<typeof Events.PrefixedMessage> {
     commandName: string,
     lng: string,
   ): Promise<Command | undefined> {
-    if (Date.now() - this.lastCacheUpdate > this.CACHE_TTL) {
-      this.commandCache.clear();
-      this.lastCacheUpdate = Date.now();
-    }
-
-    const cacheKey = `${lng}:${commandName}`;
-    const cachedCommand = this.commandCache.get(cacheKey);
-
-    if (cachedCommand) {
-      return this.container.stores.get("commands").get([...cachedCommand][0]);
-    }
-
     const t = this.container.i18n.getT(lng);
     const defT =
       lng !== defaultLng ? this.container.i18n.getT(defaultLng) : null;
@@ -91,12 +74,7 @@ export class CoreListener extends Listener<typeof Events.PrefixedMessage> {
       if (!command.name.startsWith("-")) continue;
 
       const aliases = this.getCommandAliases(command, t, defT);
-
       if (aliases.has(commandName)) {
-        if (!this.commandCache.has(cacheKey)) {
-          this.commandCache.set(cacheKey, new Set());
-        }
-        this.commandCache.get(cacheKey)!.add(command.name);
         return command;
       }
     }
@@ -118,7 +96,6 @@ export class CoreListener extends Listener<typeof Events.PrefixedMessage> {
         defaultValue: [],
       }),
     );
-
     primaryAliases.forEach((alias) => aliases.add(alias.toLowerCase()));
     aliases.add(t(baseKey + "Name").toLowerCase());
 

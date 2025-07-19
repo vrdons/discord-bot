@@ -5,6 +5,7 @@ import { emojiProcessor } from "libs/language/emoji";
 import { generateDefaultVariable } from "libs/language/variable";
 import humanizeDuration, { Unit } from "humanize-duration";
 import { formatTimestamp, TIMESTAMP_TYPE } from "libs/discord";
+import prettyBytes from "pretty-bytes";
 export class I18nReadyListener extends Listener {
   public constructor(
     context: Listener.LoaderContext,
@@ -28,10 +29,9 @@ export class I18nReadyListener extends Listener {
     this.container.i18n.options.i18next = {
       ...this.container.i18n.options.i18next,
       interpolation: {
-        //@ts-ignore
-        ...(this.container.i18n.options.i18next?.interpolation ?? {}),
+        ...((this.container.i18n.options.i18next as any)?.interpolation ?? {}),
         format: (value, format, lng) => {
-          if (format == "timestamp") {
+          if (format === "timestamp") {
             return formatTimestamp(value, "R");
           }
           if (format?.startsWith("timestamp:")) {
@@ -46,21 +46,40 @@ export class I18nReadyListener extends Listener {
           }
           if (format?.startsWith("duration:")) {
             const options: Record<string, any> = { language: lng };
-
             format
               .slice(9)
               .split(",")
               .forEach((opt) => {
-                const [k, v] = opt.split("=");
-                if (k === "units") options.units = v.split("|") as Unit[];
-                else if (k === "largest") options.largest = parseInt(v);
-                else if (k === "round") options.round = v === "true";
-                else if (k === "delimiter") options.delimiter = v;
-                else if (k === "spacer") options.spacer = v;
-                else options[k] = v;
+                const [key, value] = opt.split("=");
+                if (key === "units") options.units = value.split("|") as Unit[];
+                else if (key === "largest") options.largest = parseInt(value);
+                else if (key === "round") options.round = value === "true";
+                else if (key === "delimiter") options.delimiter = value;
+                else if (key === "spacer") options.spacer = value;
+                else options[key] = value;
               });
-
-            return humanizeDuration(value, options);
+            return humanizeDuration(Math.round(parseInt(value)), options);
+          }
+          if (format === "bytes") {
+            return prettyBytes(value);
+          }
+          if (format?.startsWith("bytes:")) {
+            const options: Record<string, any> = {};
+            format
+              .slice(6)
+              .split(",")
+              .forEach((opt) => {
+                const [key, value] = opt.split("=");
+                if (key === "binary") options.binary = value === "true";
+                else if (key === "bits") options.bits = value === "true";
+                else if (key === "signed") options.signed = value === "true";
+                else if (key === "minimumFractionDigits")
+                  options.minimumFractionDigits = parseInt(value);
+                else if (key === "maximumFractionDigits")
+                  options.maximumFractionDigits = parseInt(value);
+                else options[key] = value;
+              });
+            return prettyBytes(value, options);
           }
           return value;
         },

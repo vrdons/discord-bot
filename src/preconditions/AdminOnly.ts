@@ -6,7 +6,7 @@ import {
   Message,
 } from "discord.js";
 
-export class RulesPrecontidion extends AllFlowsPrecondition {
+export class AdminOnlyPrecondition extends AllFlowsPrecondition {
   public constructor(context: AllFlowsPrecondition.LoaderContext) {
     super(context, {
       name: "AdminOnly",

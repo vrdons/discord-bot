@@ -12,14 +12,14 @@ export class CustomContainer extends ContainerBuilder {
     this.setAccentColor([255, 255, 255]);
   }
   addTitle(
-    emoji: string = "logo",
+    emoji: string | undefined = "logo",
     split: boolean,
     args: string,
     options: TOptions = {},
   ) {
     this.addTextDisplayComponents((t) =>
       t.setContent(
-        `### ${emoji == "no" ? "" : container.getEmoji(emoji)} ${container.client.user?.displayName}${split ? " | " : " "}${this.translate(args, options)}`,
+        `### ${emoji ? container.getEmoji(emoji) : ""} ${container.client.user?.displayName}${split ? " | " : " "}${this.translate(args, options)}`,
       ),
     );
     return this;
@@ -46,6 +46,27 @@ export class CustomContainer extends ContainerBuilder {
     const a2 = array.map(
       (x) => `${dot ? `${container.getEmoji("dot")} ` : ""}${x}`,
     );
+    if (multi) {
+      for (const a of a2) {
+        this.addTextDisplayComponents((t) => t.setContent(`${a}`));
+      }
+    } else
+      this.addTextDisplayComponents((t) => t.setContent(`${a2.join("\n")}`));
+    return this;
+  }
+
+  addTextsWithTitle(
+    dot: boolean,
+    args: string,
+    options: TOptions = {},
+    title: { emoji: string | undefined; text: string },
+    multi?: boolean,
+  ) {
+    const array = formatAsArray(this.lang, args, options);
+    const a2 = [
+      `### ${title.emoji ? container.getEmoji(title.emoji) : ""} ${this.translate(title.text, options)}`,
+      ...array.map((x) => `${dot ? `${container.getEmoji("dot")} ` : ""}${x}`),
+    ];
     if (multi) {
       for (const a of a2) {
         this.addTextDisplayComponents((t) => t.setContent(`${a}`));
@@ -82,7 +103,9 @@ export class CustomContainer extends ContainerBuilder {
   addLinks(type: "string" | "button" | "smolstring", addTitle = false) {
     if (addTitle)
       this.addTextDisplayComponents((t) =>
-        t.setContent(`### ${this.translate("defaults/container:links.title")}`),
+        t.setContent(
+          `### ${container.getEmoji("links.emoji")} ${this.translate("defaults/container:links.title")}`,
+        ),
       );
     if (type == "string") {
       this.addTextDisplayComponents((t) =>
@@ -105,6 +128,7 @@ export class CustomContainer extends ContainerBuilder {
             .setURL(container.links.support_server),
           new ButtonBuilder()
             .setStyle(ButtonStyle.Link)
+            .setEmoji({ id: container.getEmojiId("links.vote") })
             .setLabel(this.translate("defaults/container:links.buttons.vote"))
             .setURL(container.links.topGGVote),
           new ButtonBuilder()

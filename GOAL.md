@@ -7,20 +7,26 @@
 - [+] user locale
 - [+] locale alias (automate)
 - [+] custom randomizer
-- [+] custom i18n (emojis, formatter etc.)
+- [+] custom i18n
+- - [+] emoji handler
+- - [+] humanize number formatter
+- - [+] timestamp formatter
+- - [+] Byte formatter
 - [+] rules
 - [+] Admin only command
 - [+] custom error message (cooldown etc.)
 
 [?] Basic commands
 
+- [+] rules
 - [+] ping
-- [-] stats
+- [+] stats
 - [-] help (automated)
 - [-] [ADMIN] eval
 - [-] language
 - [-] prefix
 - [-] support
+- [-] profile (maybe after economy)
 
 [-] Basic economy commands
 

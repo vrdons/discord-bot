@@ -1,0 +1,22 @@
+{
+  "Name": "istatistik",
+  "Aliases": "botbilgi",
+  "Description": "Botun istatistiksel bilgilerini gösterir",
+  "title": "Bot Bilgileri",
+  "wait": "Hesaplanıyor, lütfen bekleyin...",
+  "titleBot": "Bot bilgileri",
+  "resultBot": [
+    "Çalışma süresi: **{{uptime, duration:units=d|h|m|s,largest=2,round=true}}**",
+    "Toplam sunucu: **{{totalServer}}**",
+    "Toplam kullanıcı: **{{totalMembers}}**",
+    "Bellek kullanımı: **{{memoryUsage, bytes}}**"
+  ],
+  "titleLatency": "Gecikme bilgileri",
+  "resultLatency": [
+    "**Bot Gecikmesi**: {{bot_ping, duration}}",
+    "**Mesaj gecikmesi**: {{message_ping, duration}}",
+    "**Veritabanı gecikmesi**: {{db_ping, duration}}"
+  ],
+  "titleOwners": "Yapımcılar",
+  "seeProfile": "Profili gör"
+}

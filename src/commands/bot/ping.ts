@@ -12,8 +12,9 @@ import { CustomContainer } from "libs/Custom/Container";
 
 @ApplyOptions<Command.Options>({
   name: "-ping",
-  cooldownDelay: 10000,
+  cooldownDelay: 5000,
   fullCategory: ["General"],
+  preconditions: [],
   cooldownLimit: 1,
 })
 export class PingCommand extends Command {
@@ -33,7 +34,8 @@ export class PingCommand extends Command {
   }
   async calculatePing(message: Command.ChatInputCommandInteraction | Message) {
     const Language = await fetchLanguage(message);
-    const text = await resolveKey(message, "commands/ping:wait");
+    const t = this.container.i18n.getT(Language);
+    const text = t("commands/ping:wait");
     let messageReply;
     if (isMessageInstance(message as Message)) {
       messageReply = await message.reply({
@@ -51,10 +53,11 @@ export class PingCommand extends Command {
     const diff = messageReply.createdTimestamp - message.createdTimestamp;
     const cont = new CustomContainer(Language);
     cont.addTitle(undefined, true, "commands/ping:title");
+    cont.addSeperator();
     cont.addTexts(
       true,
       "commands/ping:result",
-      { bot_ping: String(clientPing), message_ping: diff, db_ping: dbPing },
+      { bot_ping: clientPing, message_ping: diff, db_ping: dbPing },
       true,
     );
     messageReply.edit({
