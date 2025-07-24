@@ -1,21 +1,24 @@
 import { isMessageInstance } from "@sapphire/discord.js-utilities";
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
+import { applyLocalizedBuilder, fetchLanguage } from "@sapphire/plugin-i18next";
 import {
-  applyLocalizedBuilder,
-  fetchLanguage,
-  resolveKey,
-} from "@sapphire/plugin-i18next";
-import { ButtonStyle, Message, MessageFlags } from "discord.js";
-import { getDatabsePing } from "libs/utils";
-import { CustomContainer } from "libs/Custom/Container";
+  ButtonStyle,
+  ContainerBuilder,
+  Message,
+  MessageFlags,
+} from "discord.js";
 import { adminIds } from "config/Other";
+import { ContainerFunctions } from "libs/Custom/Container";
+import { getDatabsePing } from "libs/Utils/Database";
+import { calculateCpuUsage } from "libs/Utils/System";
 
 @ApplyOptions<Command.Options>({
   name: "-status",
   cooldownDelay: 10000,
   fullCategory: ["General"],
   cooldownLimit: 1,
+  rulesDisabled: true,
 })
 export class PingCommand extends Command {
   public override registerApplicationCommands(registry: Command.Registry) {
@@ -51,14 +54,20 @@ export class PingCommand extends Command {
     const dbPing = await getDatabsePing();
     const clientPing = this.container.client.ws.ping;
     const diff = messageReply.createdTimestamp - message.createdTimestamp;
-    const cont = new CustomContainer(Language);
-    cont.addTitle("status.emoji", true, "commands/status:title");
-    cont.addSeperator();
-    cont.addTextDisplayComponents((te) =>
-      te.setContent(
-        `### ${this.container.getEmoji("status.owner")} ${t("commands/status:titleOwners")}`,
-      ),
-    );
+    const cont = new ContainerBuilder();
+    ContainerFunctions.addTitle(cont, {
+      emoji: "status.emoji",
+      displayName: { enabled: true, splitText: true },
+      language: Language,
+      text: "commands/status:title",
+    });
+    cont.addSeparatorComponents();
+    ContainerFunctions.addTitle(cont, {
+      emoji: "status.owner",
+      displayName: { enabled: false, splitText: false },
+      language: Language,
+      text: "commands/status:titleOwners",
+    });
     adminIds.forEach((o) => {
       const user = this.container.client.users.cache.get(o);
       if (!user) return;
@@ -76,28 +85,46 @@ export class PingCommand extends Command {
         return d;
       });
     });
-    cont.addSeperator();
-    cont.addTextsWithTitle(
-      true,
-      "commands/status:resultBot",
-      {
+    cont.addSeparatorComponents();
+    ContainerFunctions.addTexts(cont, {
+      language: Language,
+      text: "commands/status:resultBot",
+      dot: true,
+      title: {
+        text: "commands/status:titleBot",
+        emoji: "status.bot",
+        displayName: { enabled: false, splitText: false },
+      },
+      translateOptions: {
         uptime: process.uptime() * 1000,
         totalServer: this.container.client.guilds.cache.size,
         totalMembers: this.container.client.users.cache.filter((x) => !x.bot)
           .size,
         memoryUsage: process.memoryUsage().heapTotal,
+        cpuUsage: await calculateCpuUsage(),
       },
-      { emoji: "status.bot", text: "commands/status:titleBot" },
-      false,
-    );
-    cont.addSeperator();
-    cont.addTextsWithTitle(
-      true,
-      "commands/status:resultLatency",
-      { bot_ping: clientPing, message_ping: diff, db_ping: dbPing },
-      { emoji: undefined, text: "commands/status:titleLatency" },
-      false,
-    );
+    });
+    cont.addSeparatorComponents();
+    ContainerFunctions.addTexts(cont, {
+      language: Language,
+      text: "commands/status:resultLatency",
+      dot: true,
+      title: {
+        text: "commands/status:titleLatency",
+        emoji: undefined,
+        displayName: { enabled: false, splitText: false },
+      },
+      translateOptions: {
+        bot_ping: clientPing,
+        message_ping: diff,
+        db_ping: dbPing,
+      },
+    });
+    cont.addSeparatorComponents();
+    ContainerFunctions.addLinks(cont, {
+      language: Language,
+      type: "smolstring",
+    });
     messageReply.edit({
       content: "",
       components: [cont],

@@ -1,0 +1,14 @@
+{
+  "Name": "yardım",
+  "Description": "Yardım menüsünü açar.",
+  "Aliases": ["bilgi", "yardim"],
+  "Options": {
+    "CommandName": "komut",
+    "CommandDescription": "Yardım alacağın komut"
+  },
+  "title": "Yardım Menüsü",
+  "categoryDescription": [
+    "Belirli bir komut hakkında daha fazla bilgi için `{{prefix}}help {command}`"
+  ],
+  "commandDescription": []
+}

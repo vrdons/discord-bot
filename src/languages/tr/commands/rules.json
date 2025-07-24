@@ -1,6 +1,6 @@
 {
   "Name": "kurallar",
-  "Description": "Botun kurallarını gösterir",
+  "Description": "Botun kurallarını gösterir.",
   "Aliases": ["kural", "esaslar"],
 
   "title": "Kurallar",
@@ -10,8 +10,7 @@
   "botDescription": [
     "Botta bulunan herhangi bir ürünün ticaretini yapmak yasaktır.",
     "Botta bulunan hataları geliştiricilere bildirmeyip, kendi yararınıza kullanmanız yasaktır.",
-    "Otomatik olarak botta gelişmenizi sağlayacak yazılım dosyaları kullanmanız yasaktır.",
-    "Botta elde ettiğiniz verilerin, geleceğe dair hiçbir garantisi bulunmamaktadır. Botun amacı ve işleyiş şekli herhangi bir zamanda değiştirilebilir."
+    "Otomatik olarak botta gelişmenizi sağlayacak yazılım dosyaları kullanmanız yasaktır."
   ],
   "extraInformation": [
     "[[warning]] *Burada yazılı olan kuralların ihlal edilmesi sonucunda sınırsız karaliste veya gerekli cezalandırmalar ile karşılaşabilirsiniz*\\*!",
@@ -19,6 +18,7 @@
   ],
   "buttons": {
     "accept": "Kabul ediyorum",
+    "accepted": "Kabul edildi",
     "decline": "Reddediyorum"
   }
 }

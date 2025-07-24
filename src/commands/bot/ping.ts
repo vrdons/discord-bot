@@ -6,10 +6,9 @@ import {
   fetchLanguage,
   resolveKey,
 } from "@sapphire/plugin-i18next";
-import { Message, MessageFlags } from "discord.js";
-import { getDatabsePing } from "libs/utils";
-import { CustomContainer } from "libs/Custom/Container";
-
+import { ContainerBuilder, Message, MessageFlags } from "discord.js";
+import { ContainerFunctions } from "libs/Custom/Container";
+import { getDatabsePing } from "libs/Utils/Database";
 @ApplyOptions<Command.Options>({
   name: "-ping",
   cooldownDelay: 5000,
@@ -51,15 +50,24 @@ export class PingCommand extends Command {
     const dbPing = await getDatabsePing();
     const clientPing = this.container.client.ws.ping;
     const diff = messageReply.createdTimestamp - message.createdTimestamp;
-    const cont = new CustomContainer(Language);
-    cont.addTitle(undefined, true, "commands/ping:title");
-    cont.addSeperator();
-    cont.addTexts(
-      true,
-      "commands/ping:result",
-      { bot_ping: clientPing, message_ping: diff, db_ping: dbPing },
-      true,
-    );
+    const cont = new ContainerBuilder();
+    ContainerFunctions.addTitle(cont, {
+      displayName: { enabled: true, splitText: true },
+      language: Language,
+      text: "commands/ping:title",
+    });
+    cont.addSeparatorComponents((s) => s);
+    ContainerFunctions.addTexts(cont, {
+      dot: true,
+      multi: true,
+      language: Language,
+      text: "commands/ping:result",
+      translateOptions: {
+        bot_ping: clientPing,
+        message_ping: diff,
+        db_ping: dbPing,
+      },
+    });
     messageReply.edit({
       content: "",
       components: [cont],

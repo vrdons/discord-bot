@@ -1,0 +1,7 @@
+{
+  "text": "{{type}} Komutlar",
+  "Recommended": "Önerilen",
+  "General": "Genel",
+  "list": "[**`{{prefix}}{{commandName}}`**]({{website}}) -> {{commandDescription}}",
+  "list_slash": "</{{commandName}}:{{commandId}}> -> {{commandDescription}}"
+}

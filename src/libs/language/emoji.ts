@@ -4,7 +4,7 @@ import { container } from "@sapphire/framework";
 import { parse } from "jsonc-parser";
 import type { PostProcessorModule } from "i18next";
 import { parseEmoji } from "discord.js";
-import { flattenJSON } from "libs/utils";
+import { flattenJSON } from "libs/Utils/Other";
 
 declare module "@sapphire/pieces" {
   interface Container {

@@ -1,18 +1,21 @@
-import { AllFlowsPrecondition, Result, UserError } from "@sapphire/framework";
+import {
+  AllFlowsPrecondition,
+  ChatInputCommand,
+  ContextMenuCommand,
+  MessageCommand,
+} from "@sapphire/framework";
 import { sleep } from "@sapphire/utilities";
 import {
   CommandInteraction,
   ContextMenuCommandInteraction,
   Message,
-  ButtonBuilder,
-  ButtonStyle,
   ComponentType,
   Interaction,
-  MessageFlags,
+  ContainerBuilder,
 } from "discord.js";
-import { TFunction } from "i18next";
-import { CustomContainer } from "libs/Custom/Container";
+import { ContainerFunctions } from "libs/Custom/Container";
 import { deleteMessage, fetchLocale } from "libs/discord";
+import { RulesPayload } from "libs/MessagePayloads/Rules";
 import { Randomizer } from "libs/random";
 import { User } from "models/User";
 
@@ -24,17 +27,26 @@ export class RulesPrecontidion extends AllFlowsPrecondition {
     });
   }
 
-  public override async messageRun(message: Message) {
+  public override async messageRun(message: Message, command: MessageCommand) {
+    if (command.options.rulesDisabled) return this.ok();
     return this.checkRules(message.author.id, message);
   }
 
-  public override async chatInputRun(interaction: CommandInteraction) {
+  public override async chatInputRun(
+    interaction: CommandInteraction,
+    command: ChatInputCommand,
+  ) {
+    if (command.options.rulesDisabled) return this.ok();
+
     return this.checkRules(interaction.user.id, interaction);
   }
 
   public override async contextMenuRun(
     interaction: ContextMenuCommandInteraction,
-  ): Promise<Result<unknown, UserError>> {
+    command: ContextMenuCommand,
+  ) {
+    if (command.options.rulesDisabled) return this.ok();
+
     return this.checkRules(interaction.user.id, interaction);
   }
 
@@ -48,13 +60,7 @@ export class RulesPrecontidion extends AllFlowsPrecondition {
       return this.ok();
     }
     const locale = await fetchLocale(source as Interaction);
-
-    const t = this.container.i18n.getT(locale);
-    const r = RulesPrecontidion.generateRules(
-      locale,
-      t,
-      await User.totalAccepted,
-    );
+    const r = RulesPayload(locale, await User.totalAccepted);
 
     const response =
       source instanceof Message ? await source.reply(r) : await source.reply(r);
@@ -67,16 +73,23 @@ export class RulesPrecontidion extends AllFlowsPrecondition {
       });
 
       if (confirmation.customId === "accept_rules") {
+        const cont = new ContainerBuilder();
+        ContainerFunctions.addTitle(cont, {
+          displayName: { enabled: true, splitText: true },
+          language: locale,
+          text: "commands/rules:title",
+        });
+        ContainerFunctions.addText(cont, {
+          language: locale,
+          text: "commands/rules:accepted",
+          translateOptions: {
+            context: source instanceof Message ? "message" : "",
+          },
+        });
         await user.acceptRules();
         await confirmation.message
           .edit({
-            components: [
-              new CustomContainer(locale)
-                .addTitle(undefined, true, "defaults/container:rules.title")
-                .addText(false, "defaults/container:rules.accepted", {
-                  context: source instanceof Message ? "message" : "",
-                }),
-            ],
+            components: [cont],
           })
           .catch(console.log);
         await sleep(
@@ -96,40 +109,13 @@ export class RulesPrecontidion extends AllFlowsPrecondition {
       return this.error();
     }
   }
-  static generateRules(
-    lang: string,
-    t: TFunction,
-    totalAccept: any,
-    generateActionRow: boolean = true,
-  ) {
-    const comp = new CustomContainer(lang);
-    comp.addTitle(undefined, true, "commands/rules:title");
-    comp.addSeperator();
-    comp.addTexts(true, "commands/rules:botDescription");
-    comp.addSeperator();
-    comp.addTexts(false, "commands/rules:extraInformation");
-    if (generateActionRow)
-      comp.addActionRowComponents((act) =>
-        act.addComponents(
-          new ButtonBuilder()
-            .setCustomId("accept_rules")
-            .setLabel(t("commands/rules:buttons.accept"))
-            .setStyle(ButtonStyle.Primary),
-          new ButtonBuilder()
-            .setCustomId("decline_rules")
-            .setLabel(t("commands/rules:buttons.decline"))
-            .setStyle(ButtonStyle.Danger),
-        ),
-      );
-    comp.addFooter(undefined, "commands/rules:footer", {
-      totalAccept,
-    });
-    return { flags: MessageFlags.IsComponentsV2 as const, components: [comp] };
-  }
 }
 
 declare module "@sapphire/framework" {
   interface Preconditions {
     RulesOnly: never;
+  }
+  interface CommandOptions {
+    rulesDisabled?: boolean;
   }
 }

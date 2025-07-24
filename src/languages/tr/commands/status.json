@@ -1,7 +1,7 @@
 {
   "Name": "istatistik",
   "Aliases": "botbilgi",
-  "Description": "Botun istatistiksel bilgilerini gösterir",
+  "Description": "Botun istatistiksel bilgilerini gösterir.",
   "title": "Bot Bilgileri",
   "wait": "Hesaplanıyor, lütfen bekleyin...",
   "titleBot": "Bot bilgileri",
@@ -9,7 +9,8 @@
     "Çalışma süresi: **{{uptime, duration:units=d|h|m|s,largest=2,round=true}}**",
     "Toplam sunucu: **{{totalServer}}**",
     "Toplam kullanıcı: **{{totalMembers}}**",
-    "Bellek kullanımı: **{{memoryUsage, bytes}}**"
+    "Bellek kullanımı: **{{memoryUsage, bytes}}**",
+    "İşlemci kullanımı: **%{{cpuUsage}}**"
   ],
   "titleLatency": "Gecikme bilgileri",
   "resultLatency": [

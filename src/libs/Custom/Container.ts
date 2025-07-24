@@ -1,147 +1,209 @@
 import { ButtonStyle, ContainerBuilder } from "discord.js";
-import { ButtonBuilder } from "@discordjs/builders";
+import { ButtonBuilder, SectionBuilder } from "@discordjs/builders";
 import { container } from "@sapphire/framework";
-import { formatAsArray } from "libs/utils";
-import { TFunction, TOptions } from "i18next";
-export class CustomContainer extends ContainerBuilder {
-  private translate: TFunction<"translation", undefined>;
-  constructor(private lang: string) {
-    super();
-    this.translate = container.i18n.getT(this.lang);
+import { TOptions } from "i18next";
+import { formatAsArray } from "libs/Utils/Language";
 
-    this.setAccentColor([255, 255, 255]);
-  }
-  addTitle(
-    emoji: string | undefined = "logo",
-    split: boolean,
-    args: string,
-    options: TOptions = {},
-  ) {
-    this.addTextDisplayComponents((t) =>
-      t.setContent(
-        `### ${emoji ? container.getEmoji(emoji) : ""} ${container.client.user?.displayName}${split ? " | " : " "}${this.translate(args, options)}`,
+type BuilderType = ContainerBuilder | SectionBuilder;
+
+interface DisplayNameOptions {
+  enabled: boolean;
+  splitText: boolean;
+}
+
+interface TitleOptions {
+  displayName: DisplayNameOptions;
+  text: string;
+  translateOptions?: TOptions;
+  emoji?: string | null;
+}
+
+interface BaseOptions {
+  language: string | undefined;
+  text: string;
+  translateOptions?: TOptions;
+}
+
+interface TitleBaseOptions extends BaseOptions {
+  displayName: DisplayNameOptions;
+  emoji?: string;
+}
+
+interface TextOptions extends BaseOptions {
+  title?: TitleOptions;
+  dot?: boolean;
+  multi?: boolean;
+}
+
+interface FooterOptions extends BaseOptions {
+  emoji?: string;
+}
+
+interface LinksOptions {
+  language: string;
+  type: "string" | "button" | "smolstring";
+  addTitle?: boolean;
+}
+
+export class ContainerFunctions {
+  static addTitle<T extends BuilderType>(builder: T, opt: TitleBaseOptions): T {
+    const t = opt.language
+      ? container.i18n.getT(opt.language)
+      : (text: string, ..._args: any[]) => text;
+
+    const emoji =
+      opt.emoji !== null ? `${container.getEmoji(opt.emoji ?? "logo")} ` : "";
+    const displayName = opt.displayName.enabled
+      ? `${container.client.user?.displayName}${opt.displayName.splitText ? " | " : ""}`
+      : "";
+
+    builder.addTextDisplayComponents((build) =>
+      build.setContent(
+        `### ${emoji}${displayName}${t(opt.text, opt.translateOptions)}`,
       ),
     );
-    return this;
-  }
-  addFooter(emoji: string | undefined, args: string, options: TOptions = {}) {
-    this.addTextDisplayComponents((t) =>
-      t.setContent(
-        `-# ${emoji ? container.getEmoji(emoji) + " " : ""}${this.translate(args, options)}`,
-      ),
-    );
-    return this;
-  }
-  addSeperator(divide: boolean = true) {
-    this.addSeparatorComponents((s) => s.setDivider(divide));
-    return this;
-  }
-  addTexts(
-    dot: boolean,
-    args: string,
-    options: TOptions = {},
-    multi?: boolean,
-  ) {
-    const array = formatAsArray(this.lang, args, options);
-    const a2 = array.map(
-      (x) => `${dot ? `${container.getEmoji("dot")} ` : ""}${x}`,
-    );
-    if (multi) {
-      for (const a of a2) {
-        this.addTextDisplayComponents((t) => t.setContent(`${a}`));
-      }
-    } else
-      this.addTextDisplayComponents((t) => t.setContent(`${a2.join("\n")}`));
-    return this;
+
+    return builder;
   }
 
-  addTextsWithTitle(
-    dot: boolean,
-    args: string,
-    options: TOptions = {},
-    title: { emoji: string | undefined; text: string },
-    multi?: boolean,
-  ) {
-    const array = formatAsArray(this.lang, args, options);
-    const a2 = [
-      `### ${title.emoji ? container.getEmoji(title.emoji) : ""} ${this.translate(title.text, options)}`,
-      ...array.map((x) => `${dot ? `${container.getEmoji("dot")} ` : ""}${x}`),
-    ];
-    if (multi) {
-      for (const a of a2) {
-        this.addTextDisplayComponents((t) => t.setContent(`${a}`));
-      }
-    } else
-      this.addTextDisplayComponents((t) => t.setContent(`${a2.join("\n")}`));
-    return this;
-  }
-  addText(dot: boolean, args: string, options: TOptions = {}) {
-    this.addTextDisplayComponents((t) =>
-      t.setContent(
-        `${dot ? `${container.getEmoji("dot")} ` : ""}${this.translate(args, options)}`,
-      ),
+  static addFooter<T extends BuilderType>(builder: T, opt: FooterOptions): T {
+    const t = opt.language
+      ? container.i18n.getT(opt.language)
+      : (text: string, ..._args: any[]) => text;
+
+    const emoji = opt.emoji ? `${container.getEmoji(opt.emoji)} ` : "";
+
+    builder.addTextDisplayComponents((build) =>
+      build.setContent(`-# ${emoji}${t(opt.text, opt.translateOptions)}`),
     );
-    return this;
-  }
-  addString(str: string) {
-    this.addTextDisplayComponents((t) => t.setContent(str));
-    return this;
+
+    return builder;
   }
 
-  addStrings(dot: boolean, str: string[], multi?: boolean) {
-    const a2 = str.map(
-      (x) => `${dot ? `${container.getEmoji("dot")} ` : ""}${x}`,
-    );
-    if (multi) {
-      for (const a of a2) {
-        this.addTextDisplayComponents((t) => t.setContent(`${a}`));
-      }
-    } else
-      this.addTextDisplayComponents((t) => t.setContent(`${a2.join("\n")}`));
-    return this;
-  }
-  addLinks(type: "string" | "button" | "smolstring", addTitle = false) {
-    if (addTitle)
-      this.addTextDisplayComponents((t) =>
-        t.setContent(
-          `### ${container.getEmoji("links.emoji")} ${this.translate("defaults/container:links.title")}`,
-        ),
+  static addText<T extends BuilderType>(builder: T, opt: TextOptions): T {
+    const tr = opt.language
+      ? container.i18n.getT(opt.language)
+      : (text: string, ..._args: any[]) => text;
+
+    let list: string[] = [];
+
+    if (opt.title) {
+      const emoji = opt.title.emoji
+        ? `${container.getEmoji(opt.title.emoji)} `
+        : "";
+      const displayName = opt.title.displayName.enabled
+        ? `${container.client.user?.displayName}${opt.title.displayName.splitText ? " | " : ""}`
+        : "";
+
+      list.push(
+        `### ${emoji}${displayName}${tr(opt.title.text, opt.title.translateOptions)}`,
       );
-    if (type == "string") {
-      this.addTextDisplayComponents((t) =>
-        t.setContent(`${this.translate("defaults/container:links.string")}`),
+    }
+
+    list.push(tr(opt.text, opt.translateOptions));
+
+    if (!opt.multi) {
+      builder.addTextDisplayComponents((b) => b.setContent(list.join("\n")));
+    } else {
+      list.forEach((content) => {
+        builder.addTextDisplayComponents((t) => t.setContent(content));
+      });
+    }
+
+    return builder;
+  }
+
+  static addTexts<T extends BuilderType>(builder: T, opt: TextOptions): T {
+    const t = opt.language
+      ? (text: string, options?: TOptions) =>
+          formatAsArray(opt.language as string, text, options ?? {})
+      : (text: string, _options?: TOptions) => text.split(",");
+
+    const tr = opt.language
+      ? container.i18n.getT(opt.language)
+      : (text: string, ..._args: any[]) => text;
+
+    let list: string[] = [];
+
+    if (opt.title) {
+      const emoji = opt.title.emoji
+        ? `${container.getEmoji(opt.title.emoji)} `
+        : "";
+      const displayName = opt.title.displayName.enabled
+        ? `${container.client.user?.displayName}${opt.title.displayName.splitText ? " | " : ""}`
+        : "";
+
+      list.push(
+        `### ${emoji}${displayName}${tr(opt.title.text, opt.title.translateOptions)}`,
       );
-    } else if (type == "button") {
-      this.addActionRowComponents((act) =>
+    }
+
+    const array = t(opt.text, opt.translateOptions);
+    const formattedArray = array.map(
+      (x) => `${opt.dot ? `${container.getEmoji("dot")} ` : ""}${x}`,
+    );
+
+    list.push(...formattedArray);
+
+    if (!opt.multi) {
+      builder.addTextDisplayComponents((b) => b.setContent(list.join("\n")));
+    } else {
+      list.forEach((content) => {
+        builder.addTextDisplayComponents((t) => t.setContent(content));
+      });
+    }
+
+    return builder;
+  }
+
+  static addLinks<T extends BuilderType>(builder: T, opt: LinksOptions): T {
+    const t = container.i18n.getT(opt.language);
+    const str = opt.type === "smolstring" ? "-# " : "";
+
+    if (opt.type === "button" && builder instanceof ContainerBuilder) {
+      if (opt.addTitle) {
+        builder.addTextDisplayComponents((c) =>
+          c.setContent(
+            `### ${container.getEmoji("links.emoji")} ${t("defaults/container:links.title")}`,
+          ),
+        );
+      }
+
+      builder.addActionRowComponents((act) =>
         act.setComponents(
           new ButtonBuilder()
             .setStyle(ButtonStyle.Link)
-            .setLabel(
-              this.translate("defaults/container:links.buttons.website"),
-            )
+            .setLabel(t("defaults/container:links.buttons.website"))
             .setURL(container.links.website),
           new ButtonBuilder()
             .setStyle(ButtonStyle.Link)
-            .setLabel(
-              this.translate("defaults/container:links.buttons.support"),
-            )
+            .setLabel(t("defaults/container:links.buttons.support"))
             .setURL(container.links.support_server),
           new ButtonBuilder()
             .setStyle(ButtonStyle.Link)
             .setEmoji({ id: container.getEmojiId("links.vote") })
-            .setLabel(this.translate("defaults/container:links.buttons.vote"))
+            .setLabel(t("defaults/container:links.buttons.vote"))
             .setURL(container.links.topGGVote),
           new ButtonBuilder()
             .setStyle(ButtonStyle.Link)
-            .setLabel(this.translate("defaults/container:links.buttons.invite"))
+            .setLabel(t("defaults/container:links.buttons.invite"))
             .setURL(container.links.inviteLink),
         ),
       );
     } else {
-      this.addTextDisplayComponents((t) =>
-        t.setContent(`-# ${this.translate("defaults/container:links.string")}`),
-      );
+      const list: string[] = [];
+
+      if (opt.addTitle) {
+        list.push(
+          `### ${container.getEmoji("links.emoji")} ${t("defaults/container:links.title")}`,
+        );
+      }
+
+      list.push(`${str}${t("defaults/container:links.string")}`);
+
+      builder.addTextDisplayComponents((c) => c.setContent(list.join("\n")));
     }
-    return this;
+
+    return builder;
   }
 }

@@ -1,12 +1,15 @@
 {
   "links": {
     "title": "Bağlantılar",
-    "string": "[**`WEBSITE`**]({{{website}}}) | [**`DESTEK SUNUCUSU`**]({{{supportLink}}}) | [**`OY`**]({{{vote}}}) |  [**`DAVET`**]({{{inviteLink}}})",
+    "string": "[**`WEBSITE`**]({{website}}) | [**`DESTEK SUNUCUSU`**]({{supportLink}}) | [**`OY`**]({{vote}}) |  [**`DAVET`**]({{inviteLink}})",
     "buttons": {
       "website": "Website",
       "support": "Destek Sunucusu",
       "vote": "Oy",
       "invite": "Davet"
     }
+  },
+  "texts": {
+    "comingSoon": "Çok yakında..."
   }
 }

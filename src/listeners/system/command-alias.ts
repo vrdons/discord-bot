@@ -6,11 +6,11 @@ import {
   UnknownMessageCommandPayload,
 } from "@sapphire/framework";
 import { defaultLng } from "config/LanguageConfig";
-import { ensureArray } from "libs/utils";
+import { findCommand } from "libs/Utils/Command";
 
 type MessageCommand = Command & Required<Pick<Command, "messageRun">>;
 
-export class CoreListener extends Listener<
+export class CommandAlias extends Listener<
   typeof Events.UnknownMessageCommand
 > {
   public constructor(context: Listener.LoaderContext) {
@@ -28,7 +28,7 @@ export class CoreListener extends Listener<
       spaceIndex === -1 ? prefixLess : prefixLess.slice(0, spaceIndex);
 
     const lng = await this.resolveLanguage(message);
-    const command = await this.findCommand(commandName.toLowerCase(), lng);
+    const command = await findCommand(commandName.toLowerCase(), lng);
 
     if (!command) return;
 
@@ -60,56 +60,5 @@ export class CoreListener extends Listener<
       channel: message.channel,
     });
     return lng || defaultLng;
-  }
-
-  private async findCommand(
-    commandName: string,
-    lng: string,
-  ): Promise<Command | undefined> {
-    const t = this.container.i18n.getT(lng);
-    const defT =
-      lng !== defaultLng ? this.container.i18n.getT(defaultLng) : null;
-
-    for (const command of this.container.stores.get("commands").values()) {
-      if (!command.name.startsWith("-")) continue;
-
-      const aliases = this.getCommandAliases(command, t, defT);
-      if (aliases.has(commandName)) {
-        return command;
-      }
-    }
-
-    return undefined;
-  }
-
-  private getCommandAliases(
-    command: Command,
-    t: Function,
-    defT: Function | null,
-  ): Set<string> {
-    const baseKey = `commands/${command.name.slice(1)}:`;
-    const aliases = new Set<string>();
-
-    const primaryAliases = ensureArray(
-      t(baseKey + "Aliases", {
-        returnObjects: true,
-        defaultValue: [],
-      }),
-    );
-    primaryAliases.forEach((alias) => aliases.add(alias.toLowerCase()));
-    aliases.add(t(baseKey + "Name").toLowerCase());
-
-    if (defT) {
-      aliases.add(defT(baseKey + "Name").toLowerCase());
-      const defaultAliases = ensureArray(
-        defT(baseKey + "Aliases", {
-          returnObjects: true,
-          defaultValue: [],
-        }),
-      );
-      defaultAliases.forEach((alias) => aliases.add(alias.toLowerCase()));
-    }
-
-    return aliases;
   }
 }
