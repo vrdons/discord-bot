@@ -21,8 +21,8 @@
 - [+] rules
 - [+] ping
 - [+] stats
-- [-] help (automated)
-- [-] [ADMIN] eval
+- [*] help (automated)
+- [+] [ADMIN] eval
 - [-] language
 - [-] prefix
 - [-] support

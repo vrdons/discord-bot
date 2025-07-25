@@ -1,6 +1,11 @@
 import { isMessageInstance } from "@sapphire/discord.js-utilities";
 import { ApplyOptions } from "@sapphire/decorators";
-import { Command } from "@sapphire/framework";
+import {
+  Args,
+  ChatInputCommand,
+  Command,
+  MessageCommand,
+} from "@sapphire/framework";
 import {
   applyLocalizedBuilder,
   fetchLanguage,
@@ -9,6 +14,7 @@ import {
 import { ContainerBuilder, Message, MessageFlags } from "discord.js";
 import { ContainerFunctions } from "libs/Custom/Container";
 import { getDatabsePing } from "libs/Utils/Database";
+import { BaseContext, ChatInputContext, MessageContext } from "typing";
 @ApplyOptions<Command.Options>({
   name: "-ping",
   cooldownDelay: 5000,
@@ -24,16 +30,23 @@ export class PingCommand extends Command {
   }
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction,
+    context: ChatInputContext,
   ) {
-    await this.calculatePing(interaction);
+    await this.calculatePing(interaction, context);
   }
 
-  public override async messageRun(message: Message) {
-    await this.calculatePing(message);
+  public override async messageRun(
+    message: Message,
+    _args: Args,
+    context: MessageContext,
+  ) {
+    await this.calculatePing(message, context);
   }
-  async calculatePing(message: Command.ChatInputCommandInteraction | Message) {
-    const Language = await fetchLanguage(message);
-    const t = this.container.i18n.getT(Language);
+  async calculatePing(
+    message: Command.ChatInputCommandInteraction | Message,
+    context: BaseContext,
+  ) {
+    const { t, language } = context;
     const text = t("commands/ping:wait");
     let messageReply;
     if (isMessageInstance(message as Message)) {
@@ -53,14 +66,14 @@ export class PingCommand extends Command {
     const cont = new ContainerBuilder();
     ContainerFunctions.addTitle(cont, {
       displayName: { enabled: true, splitText: true },
-      language: Language,
+      language,
       text: "commands/ping:title",
     });
     cont.addSeparatorComponents((s) => s);
     ContainerFunctions.addTexts(cont, {
       dot: true,
       multi: true,
-      language: Language,
+      language,
       text: "commands/ping:result",
       translateOptions: {
         bot_ping: clientPing,

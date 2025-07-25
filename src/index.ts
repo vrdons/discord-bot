@@ -13,7 +13,6 @@ import { fetchPrefix } from "config/Prefix";
 import { importModels, Sequelize } from "@sequelize/core";
 import { PostgresDialect } from "@sequelize/postgres";
 import Links from "config/Links";
-import { RegisterBehavior } from "@sapphire/framework";
 
 const client = new SapphireClient({
   intents: [

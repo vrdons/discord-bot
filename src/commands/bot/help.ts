@@ -8,6 +8,7 @@ import {
 import { applyLocalizedBuilder, fetchLanguage } from "@sapphire/plugin-i18next";
 import { Message } from "discord.js";
 import { HelpMenuPayload } from "libs/MessagePayloads/Help";
+import { ChatInputContext, MessageContext } from "typing";
 
 @ApplyOptions<Command.Options>({
   name: "-help",
@@ -27,32 +28,37 @@ export class HelpCommand extends Command {
   }
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction,
-    _context: ChatInputCommand.RunContext,
+    context: ChatInputContext,
   ) {
-    const language = await fetchLanguage(interaction);
-    const t = this.container.i18n.getT(language);
     const str = interaction.options.getString(
-      t("commands/help:Options.CommandName"),
+      context.t("commands/help:Options.CommandName"),
     );
     return interaction.reply(
-      await HelpMenuPayload(language, {
-        arguments: str,
-      }),
+      await HelpMenuPayload(
+        context.language,
+        {
+          arguments: str,
+        },
+        interaction.user.id,
+      ),
     );
   }
 
   public override async messageRun(
     message: Message,
     args: Args,
-    context: MessageCommand.RunContext,
+    context: MessageContext,
   ) {
-    const language = await fetchLanguage(message);
     const str = await args.peekResult("string");
     return message.reply(
-      await HelpMenuPayload(language, {
-        arguments: str.isOk() ? str.unwrap() : null,
-        prefix: context.commandPrefix,
-      }),
+      await HelpMenuPayload(
+        context.language,
+        {
+          arguments: str.isOk() ? str.unwrap() : null,
+          prefix: context.commandPrefix,
+        },
+        message.author.id,
+      ),
     );
   }
 }

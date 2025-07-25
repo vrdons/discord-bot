@@ -9,7 +9,7 @@ import { ContextMenuCommandInteraction, Interaction } from "discord.js";
 import { TFunction, TOptions } from "i18next";
 import { deleteMessage, fetchLocale } from "libs/discord";
 
-export class MessageCommandDenied extends Listener<
+export class ContextMenuCommandDenied extends Listener<
   typeof Events.ContextMenuCommandDenied
 > {
   public constructor(

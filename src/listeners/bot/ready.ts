@@ -1,5 +1,5 @@
 import { Listener } from "@sapphire/framework";
-export class I18nReadyListener extends Listener {
+export class ReadyListener extends Listener {
   public constructor(
     context: Listener.LoaderContext,
     options: Listener.Options,

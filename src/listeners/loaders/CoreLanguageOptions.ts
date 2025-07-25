@@ -13,7 +13,7 @@ export class I18nReadyListener extends Listener {
   ) {
     super(context, {
       ...options,
-      once: true,
+      once: false,
       event: "ready",
     });
   }

@@ -1,9 +1,10 @@
 import { ApplyOptions } from "@sapphire/decorators";
-import { Command } from "@sapphire/framework";
-import { applyLocalizedBuilder, fetchLanguage } from "@sapphire/plugin-i18next";
+import { Args, Command } from "@sapphire/framework";
+import { applyLocalizedBuilder } from "@sapphire/plugin-i18next";
 import { Message } from "discord.js";
 import { User } from "models/User";
 import { RulesPayload } from "libs/MessagePayloads/Rules";
+import { ChatInputContext, MessageContext } from "typing";
 
 @ApplyOptions<Command.Options>({
   name: "-rules",
@@ -19,13 +20,20 @@ export class PingCommand extends Command {
   }
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction,
+    context: ChatInputContext,
   ) {
-    const lang = await fetchLanguage(interaction);
-    await interaction.reply(RulesPayload(lang, await User.totalAccepted, true));
+    await interaction.reply(
+      RulesPayload(context.language, await User.totalAccepted, true),
+    );
   }
 
-  public override async messageRun(message: Message) {
-    const lang = await fetchLanguage(message);
-    await message.reply(RulesPayload(lang, await User.totalAccepted, true));
+  public override async messageRun(
+    message: Message,
+    _args: Args,
+    context: MessageContext,
+  ) {
+    await message.reply(
+      RulesPayload(context.language, await User.totalAccepted, true),
+    );
   }
 }

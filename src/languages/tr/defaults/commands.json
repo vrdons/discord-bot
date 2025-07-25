@@ -1,0 +1,31 @@
+{
+  "text": "{{type}} Komutlar",
+
+
+  "Recommended": "Önerilen",
+  "General": "Genel",
+
+  
+  "commandUsage": [
+    "[[help.params]] **Komut Kullanım Parametreleri**",
+    "[[dot]] `[ ]` - İsteğe bağlı seçenek",
+    "[[dot]] `{ }` - İsteğe bağlı girdi"
+  ],
+  "commandArgs_slash": [
+    "[[help.commands]] **Komut Bilgi**",
+    "[[dot]] **Komut**: </{{cmdName}}:{{cmdId}}>",
+    "[[dot]] **Açıklama**: {{cmdDesc}}",
+    "[[dot]] **Argümanlar**: {{cmdArgs}}"
+  ],
+   "commandArgs": [
+    "[[help.commands]] **Komut Bilgi**",
+    "[[dot]] **Komut**: {{prefix}}{{cmdName}}",
+    "[[dot]] **Açıklama**: {{cmdDesc}}",
+    "[[dot]] **Argümanlar**: {{cmdArgs}}"
+
+  ],
+  "commandAliasesText": "[[dot]] **Diğer kullanımlar**: {{cmdAliases}}",
+
+  "list": "[**`{{prefix}}{{commandName}}`**]({{website}}) -> {{commandDescription}}",
+  "list_slash": "</{{commandName}}:{{commandId}}> -> {{commandDescription}}"
+}

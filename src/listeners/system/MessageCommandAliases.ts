@@ -7,14 +7,15 @@ import {
 } from "@sapphire/framework";
 import { defaultLng } from "config/LanguageConfig";
 import { findCommand } from "libs/Utils/Command";
+import { ExtraEvents } from "typing";
 
 type MessageCommand = Command & Required<Pick<Command, "messageRun">>;
 
 export class CommandAlias extends Listener<
-  typeof Events.UnknownMessageCommand
+  typeof ExtraEvents.FindCommandAliases
 > {
   public constructor(context: Listener.LoaderContext) {
-    super(context, { event: Events.UnknownMessageCommand });
+    super(context, { event: ExtraEvents.FindCommandAliases });
   }
 
   public async run(payload: UnknownMessageCommandPayload) {
@@ -30,7 +31,15 @@ export class CommandAlias extends Listener<
     const lng = await this.resolveLanguage(message);
     const command = await findCommand(commandName.toLowerCase(), lng);
 
-    if (!command) return;
+    if (!command) {
+      client.emit(Events.UnknownMessageCommand, {
+        message,
+        prefix,
+        commandName,
+        commandPrefix,
+      });
+      return;
+    }
 
     if (!command.messageRun) {
       client.emit(Events.CommandDoesNotHaveMessageCommandHandler, {

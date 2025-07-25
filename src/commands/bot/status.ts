@@ -1,6 +1,6 @@
 import { isMessageInstance } from "@sapphire/discord.js-utilities";
 import { ApplyOptions } from "@sapphire/decorators";
-import { Command } from "@sapphire/framework";
+import { Args, Command } from "@sapphire/framework";
 import { applyLocalizedBuilder, fetchLanguage } from "@sapphire/plugin-i18next";
 import {
   ButtonStyle,
@@ -12,6 +12,7 @@ import { adminIds } from "config/Other";
 import { ContainerFunctions } from "libs/Custom/Container";
 import { getDatabsePing } from "libs/Utils/Database";
 import { calculateCpuUsage } from "libs/Utils/System";
+import { BaseContext, ChatInputContext, MessageContext } from "typing";
 
 @ApplyOptions<Command.Options>({
   name: "-status",
@@ -28,16 +29,23 @@ export class PingCommand extends Command {
   }
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction,
+    context: ChatInputContext,
   ) {
-    await this.calculate(interaction);
+    await this.calculate(interaction, context);
   }
 
-  public override async messageRun(message: Message) {
-    await this.calculate(message);
+  public override async messageRun(
+    message: Message,
+    _args: Args,
+    context: MessageContext,
+  ) {
+    await this.calculate(message, context);
   }
-  async calculate(message: Command.ChatInputCommandInteraction | Message) {
-    const Language = await fetchLanguage(message);
-    const t = this.container.i18n.getT(Language);
+  async calculate(
+    message: Command.ChatInputCommandInteraction | Message,
+    context: BaseContext,
+  ) {
+    const { t, language } = context;
     const text = t("commands/status:wait");
     let messageReply;
     if (isMessageInstance(message as Message)) {
@@ -58,14 +66,14 @@ export class PingCommand extends Command {
     ContainerFunctions.addTitle(cont, {
       emoji: "status.emoji",
       displayName: { enabled: true, splitText: true },
-      language: Language,
+      language,
       text: "commands/status:title",
     });
     cont.addSeparatorComponents();
     ContainerFunctions.addTitle(cont, {
       emoji: "status.owner",
       displayName: { enabled: false, splitText: false },
-      language: Language,
+      language,
       text: "commands/status:titleOwners",
     });
     adminIds.forEach((o) => {
@@ -87,7 +95,7 @@ export class PingCommand extends Command {
     });
     cont.addSeparatorComponents();
     ContainerFunctions.addTexts(cont, {
-      language: Language,
+      language,
       text: "commands/status:resultBot",
       dot: true,
       title: {
@@ -106,7 +114,7 @@ export class PingCommand extends Command {
     });
     cont.addSeparatorComponents();
     ContainerFunctions.addTexts(cont, {
-      language: Language,
+      language,
       text: "commands/status:resultLatency",
       dot: true,
       title: {
@@ -122,7 +130,7 @@ export class PingCommand extends Command {
     });
     cont.addSeparatorComponents();
     ContainerFunctions.addLinks(cont, {
-      language: Language,
+      language,
       type: "smolstring",
     });
     messageReply.edit({

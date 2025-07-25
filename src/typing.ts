@@ -1,4 +1,10 @@
+import {
+  ChatInputCommandContext,
+  ContextMenuCommandContext,
+  MessageCommandContext,
+} from "@sapphire/framework";
 import Sequelize from "@sequelize/core";
+import { TFunction } from "i18next";
 
 export {};
 declare global {
@@ -17,6 +23,9 @@ declare global {
     }
   }
 }
+export enum ExtraEvents {
+  FindCommandAliases = "findCommandAliases",
+}
 declare module "@sapphire/pieces" {
   interface Container {
     database: Sequelize;
@@ -31,3 +40,14 @@ declare module "@sapphire/pieces" {
     };
   }
 }
+export interface BaseContext {
+  language: string;
+  t: TFunction;
+}
+export interface MessageContext extends MessageCommandContext, BaseContext {}
+export interface ChatInputContext
+  extends ChatInputCommandContext,
+    BaseContext {}
+export interface ContextMenuContext
+  extends ContextMenuCommandContext,
+    BaseContext {}

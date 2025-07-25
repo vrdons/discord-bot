@@ -26,7 +26,7 @@ interface BaseOptions {
 
 interface TitleBaseOptions extends BaseOptions {
   displayName: DisplayNameOptions;
-  emoji?: string;
+  emoji?: string | null;
 }
 
 interface TextOptions extends BaseOptions {
